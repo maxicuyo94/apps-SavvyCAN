@@ -8,7 +8,7 @@ on:
 jobs:
   buildwindows:
     name: Windows x64
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:      
       - name: Prepare Qt Libraries
