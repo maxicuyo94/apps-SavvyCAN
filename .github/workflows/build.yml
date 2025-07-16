@@ -13,44 +13,52 @@ jobs:
     steps:      
       - name: Prepare Qt Libraries
         uses: jurplel/install-qt-action@v3
+        with:
+          version: '5.15.2'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_mingw81'
+          modules: 'qtbase'
+
+      - name: Set up MinGW
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
 
       - name: Clone
         uses: actions/checkout@v3
       
       - name: Compile
-        shell: cmd
-        run: | 
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-
-          qmake CONFIG+=release SavvyCAN.pro
-          nmake /C
+        run: |
+          qmake SavvyCAN.pro
+          mingw32-make
 
       - name: Package
         run: |
           mkdir package
-          copy "release/SavvyCAN.exe" package/
-          mkdir package/help
-          copy  help/*.md package/help/
-          mkdir package/help/images
-          copy help/images/*.* package/help/images/
-          mkdir package/examples
-          copy examples/*.* package/examples/          
-          copy "${Env:Qt5_Dir}/bin/Qt5Core.dll" package/
-          copy "${Env:Qt5_Dir}/bin/Qt5Gui.dll" package/
-          copy "${Env:Qt5_Dir}/bin/Qt5Network.dll" package/
-          copy "${Env:Qt5_Dir}/bin/Qt5PrintSupport.dll" package/
-          copy "${Env:Qt5_Dir}/bin/Qt5Qml.dll" package/
-          copy "${Env:Qt5_Dir}/bin/Qt5SerialBus.dll" package/
-          copy "${Env:Qt5_Dir}/bin/Qt5SerialPort.dll" package/
-          copy "${Env:Qt5_Dir}/bin/Qt5Widgets.dll" package/
-          mkdir package/imageformats
-          copy "${Env:Qt5_Dir}/plugins/imageformats/*.*" package/imageformats/
-          mkdir package/platforms
-          copy "${Env:Qt5_Dir}/plugins/platforms/*.*" package/platforms/
-          mkdir package/styles
-          copy "${Env:Qt5_Dir}/plugins/styles/*.*" package/styles/
-          mkdir package/canbus
-          copy "${Env:Qt5_Dir}/plugins/canbus/*.*" package/canbus/
+          copy "release\SavvyCAN.exe" package\
+          mkdir package\help
+          copy help\*.md package\help\
+          mkdir package\help\images
+          copy help\images\*.* package\help\images\
+          mkdir package\examples
+          copy examples\*.* package\examples\
+          copy "%Qt5_Dir%\bin\Qt5Core.dll" package\
+          copy "%Qt5_Dir%\bin\Qt5Gui.dll" package\
+          copy "%Qt5_Dir%\bin\Qt5Network.dll" package\
+          copy "%Qt5_Dir%\bin\Qt5PrintSupport.dll" package\
+          copy "%Qt5_Dir%\bin\Qt5Qml.dll" package\
+          copy "%Qt5_Dir%\bin\Qt5SerialBus.dll" package\
+          copy "%Qt5_Dir%\bin\Qt5SerialPort.dll" package\
+          copy "%Qt5_Dir%\bin\Qt5Widgets.dll" package\
+          mkdir package\imageformats
+          copy "%Qt5_Dir%\plugins\imageformats\*.*" package\imageformats\
+          mkdir package\platforms
+          copy "%Qt5_Dir%\plugins\platforms\*.*" package\platforms\
+          mkdir package\styles
+          copy "%Qt5_Dir%\plugins\styles\*.*" package\styles\
+          mkdir package\canbus
+          copy "%Qt5_Dir%\plugins\canbus\*.*" package\canbus\
 
       - uses: actions/upload-artifact@v4
         with:
